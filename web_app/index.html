@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Fira Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #222222;
+            color: #eeeeee;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            background: #333333;
+            border-radius: 20px;
+            box-shadow: 10px 10px 30px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .container::before,
+        .container::after {
+            content: '';
+            position: absolute;
+            border: 5px solid transparent;
+            border-radius: 50%;
+            animation: pulse 3s infinite;
+        }
+
+        .container::before {
+            width: 200px;
+            height: 200px;
+            top: -70px;
+            left: -70px;
+            border-top-color: #ff4081;
+        }
+
+        .container::after {
+            width: 300px;
+            height: 300px;
+            bottom: -100px;
+            right: -100px;
+            border-bottom-color: #00e0ff;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        h1 {
+            font-size: 32px;
+            margin-bottom: 40px;
+            color: #ff4081;
+            text-transform: uppercase;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #00e0ff;
+            background: #222222;
+            color: #eeeeee;
+            border-radius: 15px;
+            font-size: 18px;
+            resize: none;
+            outline: none;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            background-color: #ff4081;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 64, 129, 0.4);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: #444444;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+
+        .result strong {
+            font-size: 22px;
+            color: #00e0ff;
+        }
+
+        .result span {
+            font-size: 22px;
+            color: #ff4081;
+        }
+
+        .copyright {
+            margin-top: 30px;
+            color: #999999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Sentiment Analysis</h1>
+        <form id="sentimentForm">
+            <textarea id="textInput" placeholder="Enter your text here..."></textarea>
+            <button type="submit">Analyze Sentiment</button>
+        </form>
+        <div id="result" class="result">
+            <strong>Sentiment:</strong> <span id="sentimentText"></span>
+        </div>
+        <div class="copyright">
+            &copy; 2024 Vanish Modi. All rights reserved.
+        </div>
+    </div>
+    <script>
+        document.getElementById('sentimentForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const textInput = document.getElementById('textInput').value;
+            const response = await fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: textInput })
+            });
+
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            const sentimentText = document.getElementById('sentimentText');
+
+            if (data.sentiment) {
+                sentimentText.textContent = data.sentiment;
+                resultDiv.style.display = 'block';
+            } else {
+                sentimentText.textContent = 'Error: ' + data.error;
+                resultDiv.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+
+</html>
